@@ -1,0 +1,33 @@
+/*
+Enter your query here.
+*/
+/*
+Enter your query here.
+*/
+
+select h.hacker_id, h.name, count(c.challenge_id) as total_count
+from hackers h
+join challenges c on
+h.hacker_id = c.hacker_id
+group by h.hacker_id, h.name 
+
+having total_count = (
+                     select count(c1.challenge_id) as max_count
+                     from challenges c1
+                     group by c1.hacker_id
+                     order by max_count desc
+                     limit 1
+                    )
+or total_count in 
+                 (
+                   select x.other_counts as from_only_one_student
+                   from   
+                        (
+                            select count(c2.challenge_id) as other_counts
+                            from challenges c2
+                            group by c2.hacker_id
+                        ) x
+                   group by from_only_one_student
+                   having count(from_only_one_student) = 1  
+                 )
+order by total_count desc, h.hacker_id  
